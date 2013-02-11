@@ -10,7 +10,7 @@
 
 
 
-enum sync_type {flat, keep_arch, one_folder_per_playlist};
+enum sync_type{flat, keep_arch, one_folder_per_playlist};
 enum playlist_type{m3u, xspf, wpl, amarok_db, unknown};
 
 /**
@@ -27,40 +27,43 @@ class copy_playlist_backend : public QObject
   Q_OBJECT
 public:
   //******************************************OBJECT
-  copy_playlist_backend(); 			/*!<The constructor of the class*/
-  ~copy_playlist_backend();			/*!<The destructor of the class*/
+  copy_playlist_backend(); 				/*!<The constructor of the class*/
+  ~copy_playlist_backend();				/*!<The destructor of the class*/
   //******************************************SETORS
-  bool set_Playlist_path(QString playlist_path);   /*!<Allow you to define which local playlist file (on the source device) has to be use*/
+  bool set_Playlist_path(QString playlist_path);   	/*!<Allow you to define which local playlist file (on the source device) has to be use*/
   bool set_Playlist_path(QDir playlist_path);		/*!<Overloaded function*/
+  bool set_Playlist_path(std::string playlist_path);	/*!<Overloaded funciton*/
   bool set_Device_path(QString device_path);		/*!<Define the destination directory. This is where all files will land*/
   bool set_Device_path(QDir device_path);		/*!<Overloaded function*/
+  bool set_Device_path(std::string device_path);	/*!<Overloader function*/
   bool set_Sync_type(sync_type synchronization_type);	/*!<Define the syncing strategy that has to be used*/
   void set_Embed_m3u_file(bool embed);			/*!<Choose wether a bespoke m3u (with relative file path) has to be created on the device. The m3u file will be created directly in the device path directory*/
-  void set_Dir_where_data_struct_kept(QString dir);			/*!<Define the directory under which the data structure will be kept for the keep_arch strategy. All songs will be listed have to be in this directory (or one of its subdirectory)*/
+  void set_Dir_where_data_struct_kept(QString dir);	/*!<Define the directory under which the data structure will be kept for the keep_arch strategy. All songs will be listed have to be in this directory (or one of its subdirectory)*/
   void set_Music_root_dir(QString music_root_dir);	/*!<Define the root directory that contains all the music files of the source computer*/
   //******************************************ACCESSORS
-  QStringList get_Song_list();			/*!<Get the list of songs. Eg "/path/to/song.mp3" becomes "song"*/
-  QStringList get_New_path_list();		/*!<Get the list of path (on the destination device) where songs will be copied*/
-  QString get_Last_Error();			/*!<Retrieve the last emited error*/
-  QString get_Playlist_name();			/*!<Get the name of the playlist. In case of a local file, directly the filename without extension*/
-  QString get_Full_dir_name();			/*!<Get the complete path of the destination device*/
-  QString get_Dir_name();                        /*!<Get the directory nane of the destination devices*/
-  QString get_Dir_where_data_struct_kept();	/*!<Returns the directory under which the data structure will be kept for the keep_arch strategy. All songs will be listed have to be in this directory (or one of its subdirectory)*/
-  int  get_Numbers_of_track();			/*!<Get the numbers of track that have been found in the playlist*/
-  int get_Progress(); 				/*!<Get the numbers of track already copied during the copy operation*/
+  QStringList get_Song_list();				/*!<Get the list of songs. Eg "/path/to/song.mp3" becomes "song"*/
+  QStringList get_New_path_list();			/*!<Get the list of path (on the destination device) where songs will be copied*/
+  QString get_Last_Error();				/*!<Retrieve the last emited error*/
+  std::string get_Last_Error_std_string();		/*!<Retrieve the last emited error in form of a std::string*/
+  QString get_Playlist_name();				/*!<Get the name of the playlist. In case of a local file, directly the filename without extension*/
+  QString get_Full_dir_name();				/*!<Get the complete path of the destination device*/
+  QString get_Dir_name();                        	/*!<Get the directory nane of the destination devices*/
+  QString get_Dir_where_data_struct_kept();		/*!<Returns the directory under which the data structure will be kept for the keep_arch strategy. All songs will be listed have to be in this directory (or one of its subdirectory)*/
+  int  get_Numbers_of_track();				/*!<Get the numbers of track that have been found in the playlist*/
+  int get_Progress(); 					/*!<Get the numbers of track already copied during the copy operation*/
   //******************************************ACTIONORS
  
 public slots:
-  bool Load_playlist();				/*!<Launch the operation of scanning a playlist and resolve path to all found entries*/
-  bool Load_playlist(QString playlist_path); 	/*!<Overloaded function*/
-  bool Define_new_path();			/*!<Launch the operation of resolving new path for all song that have to be copier*/
-  bool Sync_the_playlist();			/*!<Launch the actual copy operation*/
-  void Roger_the_notification_of_end_of_operation(); /*!<Tell the backend we understand the copy operation is ended. This will re-put the progress bar to 0 and SUCCESS to false*/
+  bool Load_playlist();					/*!<Launch the operation of scanning a playlist and resolve path to all found entries*/
+  bool Load_playlist(QString playlist_path); 		/*!<Overloaded function*/
+  bool Define_new_path();				/*!<Launch the operation of resolving new path for all song that have to be copier*/
+  bool Sync_the_playlist();				/*!<Launch the actual copy operation*/
+  void Roger_the_notification_of_end_of_operation(); 	/*!<Tell the backend we understand the copy operation is ended. This will re-put the progress bar to 0 and SUCCESS to false*/
   
   //******************************************METHOD
   //********************************1st level method  
 signals: 
-    void Error_raised();			/*!<Emitted when an error is encountered. This is the alarm bell of the backend*/
+    void Error_raised();				/*!<Emitted when an error is encountered. This is the alarm bell of the backend*/
     void Progress_changed();			/*!<Emitted when the progress made during the copy operation changed*/
     void Copy_operation_ended();		/*!<Emitted when thes copying operation is ended, no matter succesfuly or not*/
     void A_new_playlist_is_loaded();		/*!<Emitted if the path registered in a playlist have been successfully loaded*/
