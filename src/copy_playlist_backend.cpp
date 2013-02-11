@@ -5,7 +5,6 @@
 #include<qt4/QtCore/QDir>
 #include<qt4/QtCore/QFileInfo>
 #include<qt4/QtCore/QDebug>
-//#include<qt4/QtCore/QtXml>
 #include<qt4/QtCore/QXmlStreamReader>
 #include<qt4/QtCore/QUrl>
 #include "copy_playlist_backend.h"
@@ -61,10 +60,8 @@ bool copy_playlist_backend::set_Device_path(QDir device_path){
   return DEVICE_PATH->isReadable();
 }
 bool copy_playlist_backend::set_Device_path(std::string device_path){
-  QString dev=QString::fromStdString(device_path);
-  DEVICE_PATH->setPath(dev);
-  NEW_PATH_UPTODATE_FLAG=false;
-  return DEVICE_PATH->isReadable();
+  QString dev=QString::fromStdString(device_path.c_str());
+  return set_Device_path(dev);
 }
 bool copy_playlist_backend::set_Playlist_path(QString playlist_path){
   PLAYLIST_PATH->setPath(playlist_path);
