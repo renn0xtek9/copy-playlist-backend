@@ -1,12 +1,15 @@
 
 #ifndef COPY_PLAYLIST_BACKEND	
 #define COPY_PLAYLIST_BACKEND
+#include<iostream>
 #include<QDir>
 #include<QVector>
 #include<QFile>
 #include<QString>
 #include<QStringList>
 #include <QTextStream>
+#include <QSettings>
+
 
 
 
@@ -27,20 +30,57 @@ class copy_playlist_backend : public QObject
   Q_OBJECT
 public:
   //******************************************OBJECT
-  copy_playlist_backend(); 				/*!<The constructor of the class*/
+  //! The constructor of the class.
+    /*!
+      \param pgm_name is the programm name. It is used to defined the settings file. Settings file are defined under the folder "rainyday". Hence calling
+      with "rainyday_cmd" will create a settings file inside $HOME/.config/rainyday/rainyday_cmd.conf (On Kubuntu KDE 4 at least). The constructor will then auto load the default settings
+      contained in this file.
+      \sa  ~copy_playlist_backend()
+    */
+  copy_playlist_backend(std::string pgm_name);		
   ~copy_playlist_backend();				/*!<The destructor of the class*/
   //******************************************SETORS
-  bool set_Playlist_path(QString playlist_path);   	/*!<Allow you to define which local playlist file (on the source device) has to be use*/
+  /**
+   * Allow you to define which local playlist file (on the source device) has to be use  
+   * \param playlist_path is the full path to the playlist file e.g $HOME/Music/myplaylist.m3y
+   * \sa set_Playlist_path(std::string playlist_path), set_Playlist_path(QDir playlist_path)
+   * */
+  bool set_Playlist_path(QString playlist_path);   	
   bool set_Playlist_path(QDir playlist_path);		/*!<Overloaded function*/
-  bool set_Playlist_path(std::string playlist_path);	/*!<Overloaded funciton*/
-  bool set_Device_path(QString device_path);		/*!<Define the destination directory. This is where all files will land*/
+  bool set_Playlist_path(std::string playlist_path);	/*!<Overloaded function*/
+  /** 
+   * Define the destination directory. This is where all files will land
+   * @param device_path is the full path where you want to put you music in. Example. If you have connected your smartphone Nokia N900 with usb on linux, then it will be /media/Nokia N900/.sounds/Music
+   * @see set_Device_path(QDir device_path)
+   * @see set_Device_path(std::string device_path)
+   * */
+  bool set_Device_path(QString device_path);		
   bool set_Device_path(QDir device_path);		/*!<Overloaded function*/
-  bool set_Device_path(std::string device_path);	/*!<Overloader function*/
+  bool set_Device_path(std::string device_path);	/*!<Overloaded function. CAREFULL: rember to use backslash for each blankspaces*/
+  /**
+   * Define the sync strategy that has to be used. See the documentation manual for more information
+   * @param synchronization_type is a sync_type object and get one of its three values (flat, keep_arch, one_folder_per_playlist)
+   * */
   bool set_Sync_type(sync_type synchronization_type);	/*!<Define the syncing strategy that has to be used*/
+  /**
+   * Define wether a bespoke m3u (with relative file path inside) has to be created on the device. The .m3u file will be created directly in the device path directory
+   * @param embed true if you want to embed, false if you don't
+   */
   void set_Embed_m3u_file(bool embed);			/*!<Choose wether a bespoke m3u (with relative file path) has to be created on the device. The m3u file will be created directly in the device path directory*/
-  void set_Dir_where_data_struct_kept(QString dir);	/*!<Define the directory under which the data structure will be kept for the keep_arch strategy. All songs will be listed have to be in this directory (or one of its subdirectory)*/
+  /**
+   * Define the root directory that contains all the music files of the source computer. When using keep strategy, should one of the song be outside this tree, then the song will be copied as in flat strategy, not in a subdirectory
+   * @param music_root_dir full path to the Music directory of the computer. Example $HOME/Music
+   * @see set_Music_root_dir(std::string music_root_dir)
+   * */
   void set_Music_root_dir(QString music_root_dir);	/*!<Define the root directory that contains all the music files of the source computer*/
+  void set_Music_root_dir(std::string music_root_dir);  /*!<Overloaded function*/
+  /**
+   * Define wether we want to output each internal error to the standard output
+   * @param print true if we want to print, false if we don't default is false
+   * */
+  void set_Print_Error_to_stdout(bool print);			
   //******************************************ACCESSORS
+  
   QStringList get_Song_list();				/*!<Get the list of songs. Eg "/path/to/song.mp3" becomes "song"*/
   QStringList get_New_path_list();			/*!<Get the list of path (on the destination device) where songs will be copied*/
   QString get_Last_Error();				/*!<Retrieve the last emited error*/
@@ -48,8 +88,8 @@ public:
   QString get_Playlist_name();				/*!<Get the name of the playlist. In case of a local file, directly the filename without extension*/
   QString get_Full_dir_name();				/*!<Get the complete path of the destination device*/
   QString get_Dir_name();                        	/*!<Get the directory nane of the destination devices*/
-  QString get_Dir_where_data_struct_kept();		/*!<Returns the directory under which the data structure will be kept for the keep_arch strategy. All songs will be listed have to be in this directory (or one of its subdirectory)*/
-  int  get_Numbers_of_track();				/*!<Get the numbers of track that have been found in the playlist*/
+  QString get_Music_root_dir();			/*!<Returns the directory under which the data structure will be kept for the keep_arch strategy. All songs will be listed have to be in this directory (or one of its subdirectory)*/
+  int get_Numbers_of_track();				/*!<Get the numbers of track that have been found in the playlist*/
   int get_Progress(); 					/*!<Get the numbers of track already copied during the copy operation*/
   //******************************************ACTIONORS
  
@@ -59,6 +99,7 @@ public slots:
   bool Define_new_path();				/*!<Launch the operation of resolving new path for all song that have to be copier*/
   bool Sync_the_playlist();				/*!<Launch the actual copy operation*/
   void Roger_the_notification_of_end_of_operation(); 	/*!<Tell the backend we understand the copy operation is ended. This will re-put the progress bar to 0 and SUCCESS to false*/
+
   
   //******************************************METHOD
   //********************************1st level method  
@@ -70,6 +111,7 @@ signals:
     void The_dir_is_uptodate();			/*!<Emitted if the new path have been succesfully built*/
 private:
   //******************************************OBJECT
+  QSettings* SETTINGS;				/*!<Hold the default settings of the backend */
   QVector<QDir> SONG_PATH_LIST;			/*!<The list of path to all songs found in the playlist*/
   QVector<QDir>	NEW_SONG_PATH;			/*!<The list of path where all songs will be copied*/
   QDir* DEVICE_PATH;				/*!<The path in which the user want to sync the songs(where it will be written)*/
@@ -85,8 +127,11 @@ private:
   bool NEW_PATH_UPTODATE_FLAG;			/*!<FLAG: if the new path have been resolved or not*/
   bool EMBED_M3U;				/*!<Define wether an m3u file has to be written or not together with the sync operation!*/
   bool SUCCESS;					/*!<Is true if the copy operation is a success. It becomes true just when Progress reach 100%*/
+  bool PRINT_ERR_TO_STDOUT;			/*!<True= print each error to stdout False= don't*/
   //******************************************METHOD
   //********************************1st level method
+  void Autoload_settings();			/*!<Automatically preload settings from a .conf file*/
+  void Autosave_settings();			/*!<Automatically save settings */
   bool List_all_files();			/*!<List all the file referenced in the playlist file located at *PLAYLIST_PATH and write their address in SONG_PATH_LIST This is an internal function called by Loadplaylist. The function is hence private*/
   bool Define_new_m3u();			/*!<This function create a new m3u file that will be located in *DEVICE_PATH (embeded on the device). The song reference in this m3u will be those contained in *NEW_SONG_PATH. The *NEW_SONG_PATH is obviously modified, so that the path in the playlist is a relative path from *DEVICE_PATH to *NEW_SONG_PATH*/
   bool Autodetect_playlist_type();		/*!<This function autodetect the playlist type (i.e m3u, xspf, wpl etc) based on the extension of the file. The result is stored in PLAYLIST_TYPE IMPORTANT: currently, autodetection of amarok db playlist is not working. The PLAYLIST_TYPE in case of amarok_db has to be forced from elsewhere and this method will then return a true*/
@@ -106,8 +151,10 @@ private:
   QString Get_the_following_record();		/*!<Search the FILE_STREAM for the next record (next path to a song) contains into the stream. Returns empty string ("") if no further record is found. IMPORTANT: CURRENTLY ONLY M3U IMPLEMENTED*/
   QString Get_name_of_file_from_path(QDir* dir);/*!<Return the file name (without extension) for the file located at the *dir path*/
   QDir Build_a_new_path(QDir* device_path, QDir* song_path ); /*!<Build a new path by adding: (the relative path from *PLAYLIST_PATH to *song_path) to (*DEVICE_PATH)*/
-  QString Build_a_relative_path_from_here(QDir* device_path, QDir* song_path, QString rootdir);/*!<Create a relative path from the *device_path to the *song_path. This function is typically used by "Define_new_m3u" to create an embedded m3u file with relative path to emebede mp3 files*/
+  QString Build_a_relative_path_from_here(QDir* device_path, QDir* song_path, QString rootdir, bool tell_me_reach_root);/*!<Create a relative path from the *device_path to the *song_path. This function is typically used by "Define_new_m3u" to create an embedded m3u file with relative path to emebede mp3 files*/
   //low level method********************************
+private slots:
+  void Print_err_to_stdout();			/*!<Take the las error and print it (if PRINT_ERR_TO_STDOUT is true)*/
   
 };
 
