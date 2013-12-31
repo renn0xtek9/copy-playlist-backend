@@ -1,0 +1,31 @@
+Source: libcopy-playlist-backend
+Priority: extra
+Maintainer: wotan <maxime.haselbauer@googlemail.com>
+Build-Depends: debhelper (>= 8.0.0), cmake , libqt4-dev, libqtcore4, libqtgui4
+Standards-Version: 3.9.2
+Section: libs
+Homepage: <https://gitorious.org/copy_playlist_backend>
+#Vcs-Git: git://gitorious.org/copy_playlist_backend/copy_playlist_backend.git
+#Vcs-Browser: https://git.gitorious.org/copy_playlist_backend/copy_playlist_backend.git
+
+Package: libcopy-playlist-backend-dev
+Section: libdevel
+Architecture: any
+Depends: libcopy-playlist-backend (= ${binary:Version})
+Description: Copy audio playlist, with their content. devel only 
+  libcopy_playlist_backend provide a class that allow you to easily copy an audio playlist (m3u, xspf, wpl (not yet supported) amarok internal db (not yet supported) onto a device (smartphone, usb stick) or a given directory. It can save the files in 3 several strategy
+    * copy all audio files in one directory
+    * copy all audio files in one directory and rename them after their order in the playlist
+    * copy all audio files with the same folder-tree structure as on the source device
+ For all 3 strategies, it can embed an m3u file that can be used by the device (e.g Nokia N900) to read the audio playlist
+
+Package: libcopy-playlist-backend
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends} ,libqt4-xml, libqtcore4, libqtgui4
+Description: Copy audio playlist, with their content.
+ libcopy_playlist_backend provide a class that allow you to easily copy an audio playlist (m3u, xspf, wpl (not yet supported) amarok internal db (not yet supported) onto a device (smartphone, usb stick) or a given directory. It can save the files in 3 several strategy
+    * copy all audio files in one directory
+    * copy all audio files in one directory and rename them after their order in the playlist
+    * copy all audio files with the same folder-tree structure as on the source device
+ For all 3 strategies, it can embed an m3u file that can be used by the device (e.g Nokia N900) to read the audio playlist
