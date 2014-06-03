@@ -1,4 +1,4 @@
-libcopy-playlist-backend (1.0.0) precise; urgency=low
+libcopy-playlist-backend (1.0.0) trusty; urgency=low
 
   * Initial release 
 
