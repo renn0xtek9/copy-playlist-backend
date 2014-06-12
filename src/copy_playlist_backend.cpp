@@ -5,7 +5,8 @@
 #include<QStringList>
 #include<QDir>
 #include<QFileInfo>
-//#include<QDebug>
+#include<QTextCodec>
+// #include<QDebug>
 #include<QXmlStreamReader>
 #include<QUrl>
 #include "copy_playlist_backend.h"
@@ -13,6 +14,7 @@
 
 copy_playlist_backend::copy_playlist_backend(std::string pgm_name){
   QString programname=QString::fromStdString(pgm_name);
+  QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
   PLAYLIST_FILE=NULL;
   FILE_STREAM=NULL;
   SETTINGS=new QSettings("rainyday",programname); 	
@@ -396,13 +398,14 @@ bool copy_playlist_backend::List_all_files_from_m3u(){
     QDir dir_buffer(QDir::current());
     while(FILE_STREAM->atEnd()==FALSE){
       dir_buffer.setPath(Get_the_following_record());
+//       qDebug()<<dir_buffer;
       if (dir_buffer.isRelative()){
 	dir_buffer.setPath(dir_buffer.absolutePath());;
       }      
       if (is_Valid_song_path(dir_buffer)){
 	if (!result){
 	  result=true; 
-	} 		//as soon as we got on valid song we get loaded THIS CHANGE THE PLAYLIST_LOADED_FLAG
+	} 		//as soon as we got one valid song we get loaded THIS CHANGE THE PLAYLIST_LOADED_FLAG
 	SONG_PATH_LIST.append(dir_buffer);
       }
       else{
@@ -453,7 +456,10 @@ bool copy_playlist_backend::List_all_files_from_xspf(){
 	      if(xmlStream.tokenType() != QXmlStreamReader::Characters) {
 		  return false; //TODO HANDLE THIS ERROR WHERE THERE IS NOTHING BETWEEN <location> and </location>
 	      }
-	      list_of_locations.append(xmlStream.text().toString());
+	     list_of_locations.append(xmlStream.text().toUtf8());
+// 	      list_of_locations.append(xmlStream.text().toString().toUtf8());
+// 	     qDebug()<<QUrl::fromPercentEncoding(list_of_locations.at(list_of_locations.size()-1).toUtf8());
+// 	      qDebug()<<list_of_locations.at(list_of_locations.size()-1);
 	      //qDebug()<<"location registered is: "<<list_of_locations.at(list_of_locations.size()-1);
 	    }
         }
@@ -464,6 +470,7 @@ bool copy_playlist_backend::List_all_files_from_xspf(){
       dir_buffer.setPath(QUrl::fromEncoded(list_of_locations.at(i).toAscii()).path());
       if (dir_buffer.isRelative()){
 	dir_buffer.setPath(dir_buffer.absolutePath());
+// 	qDebug()<<dir_buffer;
       }
       if (is_Valid_song_path(dir_buffer)){
 	if (!result){
@@ -509,6 +516,7 @@ bool copy_playlist_backend::Open_local_playlist_file(){
     PLAYLIST_FILE=Filebuffer;		//WARNING need to ensure that when the function close the QFile pointed by Flbuffer won't be destroyed
     QTextStream* streambuffer=new QTextStream(PLAYLIST_FILE);
     FILE_STREAM=streambuffer;		//WARNING same thing here
+    FILE_STREAM->setCodec(QTextCodec::codecForName("UTF-8"));
   }
   return Filebuffer->isOpen();
 }

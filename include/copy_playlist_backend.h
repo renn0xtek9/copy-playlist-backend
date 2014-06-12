@@ -88,7 +88,7 @@ public:
   QString get_Playlist_name();				/*!<Get the name of the playlist. In case of a local file, directly the filename without extension*/
   QString get_Full_dir_name();				/*!<Get the complete path of the destination device*/
   QString get_Dir_name();                        	/*!<Get the directory nane of the destination devices*/
-  QString get_Music_root_dir();			/*!<Returns the directory under which the data structure will be kept for the keep_arch strategy. All songs will be listed have to be in this directory (or one of its subdirectory)*/
+  QString get_Music_root_dir();				/*!<Returns the directory under which the data structure will be kept for the keep_arch strategy. All songs will be listed have to be in this directory (or one of its subdirectory)*/
   int get_Numbers_of_track();				/*!<Get the numbers of track that have been found in the playlist*/
   int get_Progress(); 					/*!<Get the numbers of track already copied during the copy operation*/
   //******************************************ACTIONORS
